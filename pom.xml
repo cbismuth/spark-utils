@@ -31,7 +31,7 @@
 
     <groupId>com.github.cbismuth</groupId>
     <artifactId>spark-utils</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-M1</version>
 
     <name>Apache Spark utilities</name>
     <description>Pretty handy Apache Spark thin wrappers.</description>
