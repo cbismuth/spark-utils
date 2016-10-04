@@ -9,7 +9,9 @@
 
 ## Description
 
-TODO
+Handy Apache Spark thin wrappers.
+
+* [AutoCloseableBroadcast](src/main/java/com/github/cbismuth/spark/utils/AutoCloseableBroadcast.java)
 
 ## Issues
 
