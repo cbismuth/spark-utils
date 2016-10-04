@@ -24,21 +24,10 @@
 
 package com.github.cbismuth.spark.utils;
 
-import org.junit.Test;
-import org.slf4j.Logger;
+public class Nop {
 
-import static org.junit.Assert.assertTrue;
-import static org.slf4j.LoggerFactory.getLogger;
-
-public class NopTest {
-
-    private static final Logger LOGGER = getLogger(NopTest.class);
-
-    @Test
-    public void testNop() {
-        assertTrue(new Nop().nop());
-
-        LOGGER.info("Nop test successfully executed");
+    public boolean nop() {
+        return true;
     }
 
 }
