@@ -41,16 +41,14 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class AutoCloseableBroadcastTest {
 
-    private static final Object[][] DATA = {
-        { true },
-        { false },
-        };
-    public static final Long EXPECTED_BROADCAST_VALUE = 0L;
+    private static final Object[][] DATA = { { true }, { false }, };
 
     @Parameterized.Parameters(name = "blocking: {0}")
     public static Collection<Object[]> data() {
         return Arrays.stream(DATA).collect(toList());
     }
+
+    private static final Long EXPECTED_BROADCAST_VALUE = 0L;
 
     private final boolean blocking;
     private final String name = getClass().getSimpleName();
