@@ -62,7 +62,7 @@ public class AutoCloseableBroadcastTest {
         try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf());
              final AutoCloseableBroadcast<Long> broadcast = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE))) {
 
-            assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.value().getValue());
+            assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.getBroadcast().getValue());
 
         }
     }
@@ -72,7 +72,7 @@ public class AutoCloseableBroadcastTest {
         try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf());
              final AutoCloseableBroadcast<Long> broadcast = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE), blocking)) {
 
-            assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.value().getValue());
+            assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.getBroadcast().getValue());
 
         }
     }
@@ -82,7 +82,7 @@ public class AutoCloseableBroadcastTest {
         try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf());
              final AutoCloseableBroadcast<Long> broadcast = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE), blocking, name)) {
 
-            assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.value().getValue());
+            assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.getBroadcast().getValue());
 
         }
     }

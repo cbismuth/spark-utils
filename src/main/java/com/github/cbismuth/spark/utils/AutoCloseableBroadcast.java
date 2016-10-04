@@ -51,7 +51,7 @@ public class AutoCloseableBroadcast<T> implements AutoCloseable {
         this.name = name;
     }
 
-    public Broadcast<T> value() {
+    public Broadcast<T> getBroadcast() {
         return broadcast;
     }
 
