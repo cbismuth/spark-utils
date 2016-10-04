@@ -51,8 +51,12 @@ public class AutoCloseableBroadcast<T> implements AutoCloseable {
         this.name = name;
     }
 
+    public Broadcast<T> value() {
+        return broadcast;
+    }
+
     @Override
-    public void close() throws Exception {
+    public void close() {
         final String name = this.name != null ? this.name : "null";
 
         if (broadcast != null) {
