@@ -143,7 +143,6 @@
         </plugins>
     </build>
 
-
     <profiles>
         <profile>
             <id>coverage</id>
