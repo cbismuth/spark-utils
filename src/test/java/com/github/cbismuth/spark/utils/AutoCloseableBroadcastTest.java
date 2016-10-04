@@ -59,49 +59,37 @@ public class AutoCloseableBroadcastTest {
 
     @Test
     public void testAutoCloseableBroadcast_withBaseConstructor() {
-        final SparkConf sparkConf = new SparkConf().setAppName(randomUUID().toString())
-                                                   .setMaster("local");
+        try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf());
+             final AutoCloseableBroadcast<Long> broadcast = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE))) {
 
-        try (final JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
-             final AutoCloseableBroadcast<Long> ignored = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE))) {
-
-            assertEquals(EXPECTED_BROADCAST_VALUE, ignored.value().getValue());
+            assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.value().getValue());
 
         }
     }
 
     @Test
     public void testAutoCloseableBroadcast_withConstructorWithoutName() {
-        final SparkConf sparkConf = new SparkConf().setAppName(randomUUID().toString())
-                                                   .setMaster("local");
+        try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf());
+             final AutoCloseableBroadcast<Long> broadcast = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE), blocking)) {
 
-        try (final JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
-             final AutoCloseableBroadcast<Long> ignored = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE), blocking)) {
-
-            assertEquals(EXPECTED_BROADCAST_VALUE, ignored.value().getValue());
+            assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.value().getValue());
 
         }
     }
 
     @Test
     public void testAutoCloseableBroadcast_valid() {
-        final SparkConf sparkConf = new SparkConf().setAppName(randomUUID().toString())
-                                                   .setMaster("local");
+        try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf());
+             final AutoCloseableBroadcast<Long> broadcast = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE), blocking, name)) {
 
-        try (final JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
-             final AutoCloseableBroadcast<Long> ignored = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE), blocking, name)) {
-
-            assertEquals(EXPECTED_BROADCAST_VALUE, ignored.value().getValue());
+            assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.value().getValue());
 
         }
     }
 
     @Test
     public void testAutoCloseableBroadcast_invalid() {
-        final SparkConf sparkConf = new SparkConf().setAppName(randomUUID().toString())
-                                                   .setMaster("local");
-
-        try (final JavaSparkContext sparkContext = new JavaSparkContext(sparkConf)) {
+        try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf())) {
 
             final Broadcast<Integer> broadcast = sparkContext.broadcast(0);
             broadcast.destroy(true);
@@ -120,6 +108,11 @@ public class AutoCloseableBroadcastTest {
         try (final AutoCloseableBroadcast<Integer> ignored = new AutoCloseableBroadcast<>(broadcast, blocking, name)) {
             // no exception raised
         }
+    }
+
+    private SparkConf newSparkConf() {
+        return new SparkConf().setAppName(randomUUID().toString())
+                              .setMaster("local");
     }
 
 }
