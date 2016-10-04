@@ -41,7 +41,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class AutoCloseableBroadcastTest {
 
-    private static final Object[][] DATA = { { true }, { false }, };
+    private static final Object[][] DATA = { { true }, { false } };
 
     @Parameterized.Parameters(name = "blocking: {0}")
     public static Collection<Object[]> data() {
@@ -102,13 +102,14 @@ public class AutoCloseableBroadcastTest {
                                                    .setMaster("local");
 
         try (final JavaSparkContext sparkContext = new JavaSparkContext(sparkConf)) {
-            final Broadcast<Integer> broadcast = sparkContext.broadcast(0);
 
+            final Broadcast<Integer> broadcast = sparkContext.broadcast(0);
             broadcast.destroy(true);
 
             try (final AutoCloseableBroadcast<Integer> ignored = new AutoCloseableBroadcast<>(broadcast, blocking, name)) {
                 // no exception raised
             }
+
         }
     }
 
