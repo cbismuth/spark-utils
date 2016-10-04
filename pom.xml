@@ -34,7 +34,7 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <name>Apache Spark utilities</name>
-    <description>Pretty handy Apache Spark thin wrappers</description>
+    <description>Pretty handy Apache Spark thin wrappers.</description>
     <url>https://github.com/cbismuth/spark-utils</url>
     <licenses>
         <license>
