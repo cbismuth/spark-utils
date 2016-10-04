@@ -1,6 +1,9 @@
 # Spark Utils
 
 [![build](https://travis-ci.org/cbismuth/spark-utils.svg?branch=master)](https://travis-ci.org/cbismuth/spark-utils)
+[![coverage](https://coveralls.io/repos/github/cbismuth/spark-utils/badge.svg?branch=master)](https://coveralls.io/github/cbismuth/spark-utils?branch=master)
+[![javadoc](http://javadoc.io/badge/com.github.cbismuth/spark-utils.svg)](http://javadoc.io/doc/com.github.cbismuth/spark-utils)
+[![repository](https://maven-badges.herokuapp.com/maven-central/com.github.cbismuth/spark-utils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.cbismuth/spark-utils/)
 [![issues](https://img.shields.io/github/issues/cbismuth/spark-utils.svg)](https://github.com/cbismuth/spark-utils/issues)
 [![licence](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/cbismuth/spark-utils/master/LICENSE.md)
 
