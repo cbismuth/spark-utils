@@ -24,19 +24,28 @@
   ~ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   -->
 
-<configuration>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,UTC} %highlight(%-5level) %m%n</pattern>
-            <charset>utf8</charset>
-        </encoder>
+    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
+        </layout>
     </appender>
 
-    <logger name="com.github.cbismuth.spark.utils" level="${logging.level.spark.utils:-INFO}"/>
+    <logger name="com.github.cbismuth.spark.utils">
+        <level value="INFO"/>
+        <appender-ref ref="console"/>
+    </logger>
 
-    <root level="${logging.level.root:-WARN}">
-        <appender-ref ref="CONSOLE"/>
+    <logger name="org.apache.hadoop.hdfs.MiniDFSCluster">
+        <level value="DEBUG"/>
+        <appender-ref ref="console"/>
+    </logger>
+
+    <root>
+        <level value="WARN"/>
+        <appender-ref ref="console"/>
     </root>
 
-</configuration>
+</log4j:configuration>

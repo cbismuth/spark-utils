@@ -87,6 +87,7 @@
         <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
 
         <spark.version>1.6.2</spark.version>
+        <spark-hadoop.version>2.2.0</spark-hadoop.version>
         <jcl-over-slf4j.version>1.7.21</jcl-over-slf4j.version>
         <logback.version>1.1.3</logback.version>
         <junit.version>4.12</junit.version>
@@ -249,26 +250,13 @@
             <artifactId>spark-core_2.11</artifactId>
             <version>${spark.version}</version>
             <scope>provided</scope>
-            <exclusions>
-                <!-- Avoid conflicts with log4j-over-slf4j artifact -->
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
-        <!-- Logging -->
+        <!-- MiniDFSCluster -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${jcl-over-slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-            <scope>runtime</scope>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-minicluster</artifactId>
+            <version>${spark-hadoop.version}</version>
         </dependency>
 
         <!-- Testing -->

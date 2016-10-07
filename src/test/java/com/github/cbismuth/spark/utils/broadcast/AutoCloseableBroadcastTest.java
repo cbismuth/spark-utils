@@ -22,8 +22,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.spark.utils;
+package com.github.cbismuth.spark.utils.broadcast;
 
+import com.github.cbismuth.spark.utils.cluster.HadoopFactory;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
@@ -41,17 +42,18 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class AutoCloseableBroadcastTest {
 
-    private static final Object[][] DATA = { { true }, { false } };
+    private static final Object[][] blockingValues = { { true }, { false } };
 
     @Parameterized.Parameters(name = "blocking: {0}")
     public static Collection<Object[]> data() {
-        return Arrays.stream(DATA).collect(toList());
+        return Arrays.stream(blockingValues).collect(toList());
     }
 
     private static final Long EXPECTED_BROADCAST_VALUE = 0L;
 
     private final boolean blocking;
     private final String name = getClass().getSimpleName();
+    private final HadoopFactory hadoopFactory = new HadoopFactory();
 
     public AutoCloseableBroadcastTest(final boolean blocking) {
         this.blocking = blocking;
@@ -59,7 +61,7 @@ public class AutoCloseableBroadcastTest {
 
     @Test
     public void testAutoCloseableBroadcast_withBaseConstructor() {
-        try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf());
+        try (final JavaSparkContext sparkContext = hadoopFactory.sparkContext();
              final AutoCloseableBroadcast<Long> broadcast = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE))) {
 
             assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.getBroadcast().getValue());
@@ -69,7 +71,7 @@ public class AutoCloseableBroadcastTest {
 
     @Test
     public void testAutoCloseableBroadcast_withConstructorWithoutName() {
-        try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf());
+        try (final JavaSparkContext sparkContext = hadoopFactory.sparkContext();
              final AutoCloseableBroadcast<Long> broadcast = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE), blocking)) {
 
             assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.getBroadcast().getValue());
@@ -79,7 +81,7 @@ public class AutoCloseableBroadcastTest {
 
     @Test
     public void testAutoCloseableBroadcast_valid() {
-        try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf());
+        try (final JavaSparkContext sparkContext = hadoopFactory.sparkContext();
              final AutoCloseableBroadcast<Long> broadcast = new AutoCloseableBroadcast<>(sparkContext.broadcast(EXPECTED_BROADCAST_VALUE), blocking, name)) {
 
             assertEquals(EXPECTED_BROADCAST_VALUE, broadcast.getBroadcast().getValue());
@@ -89,7 +91,7 @@ public class AutoCloseableBroadcastTest {
 
     @Test
     public void testAutoCloseableBroadcast_invalid() {
-        try (final JavaSparkContext sparkContext = new JavaSparkContext(newSparkConf())) {
+        try (final JavaSparkContext sparkContext = hadoopFactory.sparkContext()) {
 
             final Broadcast<Integer> broadcast = sparkContext.broadcast(0);
             broadcast.destroy(true);

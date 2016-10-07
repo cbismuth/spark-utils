@@ -1,0 +1,38 @@
+{
+  "type": "record",
+  "name": "person",
+  "doc": "Sqoop import of person",
+  "fields": [
+    {
+      "name": "ID",
+      "type": [
+        "null",
+        "long"
+      ],
+      "default": null,
+      "columnName": "ID",
+      "sqlType": "-5"
+    },
+    {
+      "name": "FIRST_NAME",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "columnName": "FIRST_NAME",
+      "sqlType": "12"
+    },
+    {
+      "name": "LAST_NAME",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "columnName": "LAST_NAME",
+      "sqlType": "12"
+    }
+  ],
+  "tableName": "person"
+}

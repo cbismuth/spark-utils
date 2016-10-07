@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.cbismuth.spark.utils;
+package com.github.cbismuth.spark.utils.broadcast;
 
 import org.apache.spark.broadcast.Broadcast;
 import org.slf4j.Logger;
