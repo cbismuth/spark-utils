@@ -28,6 +28,8 @@ import com.google.common.base.Objects;
 
 public class Person implements Comparable<Person> {
 
+    public static final String SCHEMA = "/schema/person.avsc";
+
     public enum Sqoop {
         ID,
         FIRST_NAME,

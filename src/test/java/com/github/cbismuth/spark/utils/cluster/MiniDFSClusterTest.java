@@ -34,8 +34,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,45 +45,49 @@ import static com.github.cbismuth.spark.utils.cluster.model.Person.Sqoop.FIRST_N
 import static com.github.cbismuth.spark.utils.cluster.model.Person.Sqoop.ID;
 import static com.github.cbismuth.spark.utils.cluster.model.Person.Sqoop.LAST_NAME;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.format;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 public class MiniDFSClusterTest {
 
-    private static final Logger LOGGER = getLogger(MiniDFSClusterTest.class);
-
-    // infrastructure
+    // Hadoop configuration
     private final HadoopFactory hadoopFactory = new HadoopFactory();
     private final Configuration config = hadoopFactory.config();
-    private final MiniDFSCluster cluster = hadoopFactory.cluster(config);
-    private final FileSystem fileSystem = hadoopFactory.fileSystem(cluster);
+
+    // Avro data model
+    private final Schema schema = new Schema.Parser().parse(MiniDFSClusterTest.class.getResourceAsStream(Person.SCHEMA));
 
     // I/O
     private final AvroWriter writer = new AvroWriter();
     private final SparkReader sparkReader = new SparkReader();
+    private final String outputPath = format("%s/%s/part-m-00001/avro",
+                                             config.get("fs.defaultFS"),
+                                             Person.class.getSimpleName());
 
-    // Model-related instances
-    private final RecordMapper<Person> mapper = new PersonRecordMapper();
-    private final Schema schema = new Schema.Parser().parse(getClass().getResourceAsStream("/schema/person.avsc"));
-    private final String outputPath = String.format("%s/%s/part-m-00001/avro", config.get("fs.defaultFS"), Person.class.getSimpleName());
+    // Clustering
+    private FileSystem fileSystem;
+    private MiniDFSCluster cluster;
 
     public MiniDFSClusterTest() throws IOException {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                try {
-                    LOGGER.info("Closing Hadoop file system ...");
-                    fileSystem.close();
-                    LOGGER.info("Hadoop file system closed");
+        // NOP - here to please the Java compiler ...
+    }
 
-                    LOGGER.info("Shutting down MiniDFSCluster ...");
-                    cluster.shutdown();
-                    LOGGER.info("MiniDFSCluster shut down");
-                } catch (final IOException e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-            }
-        });
+    @Before
+    public void setUp() throws IOException {
+        cluster = hadoopFactory.cluster(config);
+        fileSystem = hadoopFactory.fileSystem(cluster);
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        fileSystem.close();
+        cluster.shutdown();
     }
 
     @Test
@@ -93,6 +98,7 @@ public class MiniDFSClusterTest {
             new Person(2L, "Joshua", "Bloch"),
             new Person(3L, "Doug", "Lea")
         );
+        final RecordMapper<Person> mapper = new PersonRecordMapper();
 
         // WHEN
         writer.write(fileSystem, schema, expected, mapper, outputPath);
@@ -111,6 +117,31 @@ public class MiniDFSClusterTest {
                                                    .collect(toList());
 
             assertEquals(expected, actual);
+        }
+    }
+
+    @Test(expected = Exception.class)
+    public void testReadJavaRDDFromMiniDFSCluster_ensureException() throws IOException {
+        // GIVEN
+        final RecordMapper<Person> mapperWithException = mock(PersonRecordMapper.class);
+        doThrow(Exception.class)
+            .when(mapperWithException)
+            .mapRecord(any(Schema.class),
+                       any(Person.class));
+
+        // WHEN
+        writer.write(fileSystem, schema, singleton(mock(Person.class)), mapperWithException, outputPath);
+
+        // THEN
+        try (final JavaSparkContext sparkContext = hadoopFactory.sparkContext()) {
+            sparkReader.read(config, sparkContext, schema, outputPath)
+                       .map(record -> mock(Person.class))
+                       .collect()
+                       .stream()
+                       .sorted()
+                       .collect(toList());
+
+            fail("Exception should have been raised!");
         }
     }
 
