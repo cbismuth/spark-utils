@@ -33,12 +33,17 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumWriter;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class AvroWriter {
+
+    private static final Logger LOGGER = getLogger(AvroWriter.class);
 
     public <T> void write(final FileSystem fileSystem,
                           final Schema schema,
@@ -58,6 +63,8 @@ public class AvroWriter {
 
                     dataFileWriter.append(record);
                 } catch (final Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+
                     throw Throwables.propagate(e);
                 }
             });
