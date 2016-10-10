@@ -9,7 +9,7 @@
 
 ## Description
 
-Handy Apache Spark thin wrappers.
+Apache Spark lightweight utilities:
 
 * AutoCloseableBroadcast ([src](src/main/java/com/github/cbismuth/spark/utils/broadcast), [test](src/test/java/com/github/cbismuth/spark/utils/broadcast))
 * MiniDFSCluster with Spark ([src](src/main/java/com/github/cbismuth/spark/utils/cluster), [test](src/test/java/com/github/cbismuth/spark/utils/cluster))
