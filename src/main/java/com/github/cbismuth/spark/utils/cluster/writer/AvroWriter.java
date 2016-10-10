@@ -50,7 +50,6 @@ public class AvroWriter {
                           final Collection<T> objects,
                           final RecordMapper<T> mapper,
                           final String path) throws IOException {
-
         final DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
 
         try (final OutputStream outputStream = fileSystem.create(new Path(path));

@@ -49,7 +49,6 @@ import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -120,29 +119,17 @@ public class MiniDFSClusterTest {
         }
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = RuntimeException.class)
     public void testReadJavaRDDFromMiniDFSCluster_ensureException() throws IOException {
         // GIVEN
         final RecordMapper<Person> mapperWithException = mock(PersonRecordMapper.class);
-        doThrow(Exception.class)
+        doThrow(new RuntimeException("Exception thrown from a Mockito mock!"))
             .when(mapperWithException)
             .mapRecord(any(Schema.class),
                        any(Person.class));
 
         // WHEN
         writer.write(fileSystem, schema, singleton(mock(Person.class)), mapperWithException, outputPath);
-
-        // THEN
-        try (final JavaSparkContext sparkContext = hadoopFactory.sparkContext()) {
-            sparkReader.read(config, sparkContext, schema, outputPath)
-                       .map(record -> mock(Person.class))
-                       .collect()
-                       .stream()
-                       .sorted()
-                       .collect(toList());
-
-            fail("Exception should have been raised!");
-        }
     }
 
 }
