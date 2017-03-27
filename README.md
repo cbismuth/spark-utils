@@ -11,8 +11,9 @@
 
 Apache Spark lightweight utilities.
 
-* AutoCloseableBroadcast ([src](src/main/java/com/github/cbismuth/spark/utils/broadcast), [test](src/test/java/com/github/cbismuth/spark/utils/broadcast))
-* MiniDFSCluster with Spark ([src](src/main/java/com/github/cbismuth/spark/utils/cluster), [test](src/test/java/com/github/cbismuth/spark/utils/cluster))
+* Fluent partition mapping API ([here](src/main/java/com/github/cbismuth/spark/utils/cluster/mapper/partition))
+* Hadoop MiniDFSCluster setup with Spark ([here](src/main/java/com/github/cbismuth/spark/utils/cluster))
+* AutoCloseableBroadcast ([here](src/main/java/com/github/cbismuth/spark/utils/broadcast))
 
 ## Issues
 
