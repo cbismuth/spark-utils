@@ -7,7 +7,7 @@
 [![issues](https://img.shields.io/github/issues/cbismuth/spark-utils.svg)](https://github.com/cbismuth/spark-utils/issues)
 [![licence](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/cbismuth/spark-utils/master/LICENSE.md)
 
-## Description
+## Description
 
 Apache Spark lightweight utilities.
 
@@ -24,6 +24,6 @@ Here is how issues are triaged:
 * **Enhancement**: improves the way the application behaves but produces the same result.
 * **Spike**: improves implementation design but does not change application behaviour and produces the same result.
 
-## Credits
+## Credits
 
 Written by Christophe Bismuth, licensed under the [The MIT License (MIT)](LICENSE.md).
