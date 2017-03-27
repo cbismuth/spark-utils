@@ -37,10 +37,15 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import scala.Tuple2;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
+import static com.github.cbismuth.spark.utils.cluster.mapper.partition.PartitionMapper.newPartitionMapper;
+import static com.github.cbismuth.spark.utils.cluster.mapper.partition.PartitionToPairMapper.newPartitionToPairMapper;
 import static com.github.cbismuth.spark.utils.cluster.model.Person.Sqoop.FIRST_NAME;
 import static com.github.cbismuth.spark.utils.cluster.model.Person.Sqoop.ID;
 import static com.github.cbismuth.spark.utils.cluster.model.Person.Sqoop.LAST_NAME;
@@ -48,7 +53,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
+import static java.util.stream.Collectors.toMap;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -90,13 +96,9 @@ public class MiniDFSClusterTest {
     }
 
     @Test
-    public void testReadJavaRDDFromMiniDFSCluster() throws IOException {
+    public void testReadJavaRDDFromMiniDFSCluster_mapPartition() throws IOException {
         // GIVEN
-        final List<Person> expected = newArrayList(
-            new Person(1L, "James", "Gosling"),
-            new Person(2L, "Joshua", "Bloch"),
-            new Person(3L, "Doug", "Lea")
-        );
+        final List<Person> expected = newListOfPersons();
         final RecordMapper<Person> mapper = new PersonRecordMapper();
 
         // WHEN
@@ -105,17 +107,47 @@ public class MiniDFSClusterTest {
         // THEN
         try (final JavaSparkContext sparkContext = hadoopFactory.sparkContext()) {
             final List<Person> actual = sparkReader.read(config, sparkContext, schema, outputPath)
-                                                   .map(record -> new Person(
-                                                       (Long) record.get(ID.name()),
-                                                       (String) record.get(FIRST_NAME.name()),
-                                                       (String) record.get(LAST_NAME.name())
+                                                   .mapPartitions(newPartitionMapper(
+                                                       record -> new Person(
+                                                           (Long) record.get(ID.name()),
+                                                           (String) record.get(FIRST_NAME.name()),
+                                                           (String) record.get(LAST_NAME.name())
+                                                       )
                                                    ))
                                                    .collect()
                                                    .stream()
                                                    .sorted()
                                                    .collect(toList());
 
-            assertEquals(expected, actual);
+            assertThat(actual).isEqualTo(expected);
+        }
+    }
+
+    @Test
+    public void testReadJavaRDDFromMiniDFSCluster_mapPartitionToPair() throws IOException {
+        // GIVEN
+        final Map<Long, Person> expected = newListOfPersons().stream().collect(toMap(Person::getId, Function.identity()));
+        final RecordMapper<Person> mapper = new PersonRecordMapper();
+
+        // WHEN
+        writer.write(fileSystem, schema, expected.values(), mapper, outputPath);
+
+        // THEN
+        try (final JavaSparkContext sparkContext = hadoopFactory.sparkContext()) {
+            final Map<Long, Person> actual = sparkReader.read(config, sparkContext, schema, outputPath)
+                                                        .mapPartitionsToPair(newPartitionToPairMapper(
+                                                            record -> new Tuple2<>(
+                                                                (Long) record.get(ID.name()),
+                                                                new Person(
+                                                                    (Long) record.get(ID.name()),
+                                                                    (String) record.get(FIRST_NAME.name()),
+                                                                    (String) record.get(LAST_NAME.name())
+                                                                )
+                                                            )
+                                                        ))
+                                                        .collectAsMap();
+
+            assertThat(actual).isEqualTo(expected);
         }
     }
 
@@ -132,4 +164,11 @@ public class MiniDFSClusterTest {
         writer.write(fileSystem, schema, singleton(mock(Person.class)), mapperWithException, outputPath);
     }
 
+    private List<Person> newListOfPersons() {
+        return newArrayList(
+            new Person(1L, "James", "Gosling"),
+            new Person(2L, "Joshua", "Bloch"),
+            new Person(3L, "Doug", "Lea")
+        );
+    }
 }
